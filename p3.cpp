@@ -15,27 +15,57 @@ int height(Node* n) {
 }
 
 int getBalance(Node* n){
-  if(root==nullptr){ return 0;}
-  return height(root->left) - height(root->right);
+  if(n==nullptr){ return 0;}
+  return height(n->left) - height(n->right);
 }
 
 // --- Rotations ---
 Node* rightRotate(Node* y){
-  
+  Node* x = y->left;
+  Node* r = x->right;
+  x->right = y;
+  y->left = r;
+  return x;
 }
 
-Node* leftRotate(Node* x){
-  
+Node* leftRotate(Node* y){
+  Node* x = y->right;
+  Node* r = x->left;
+  x->left = y;
+  y->right = r;
+  return x;
 }
 
 // --- Insertion with balancing ---
-Node* insert(Node* node, int key) {
-// TODO: perform normal BST insertion
-// TODO: update height
-// TODO: get balance factor
-// TODO: apply rotations for 4 imbalance cases
-// LL, RR, LR, RL
-// TODO: return node
+Node* insert(Node* node, int key){
+  if(node == nullptr){ return new Node(key);}
+  if(key < node->key){ node->left = insert(node->left, key);}
+  else if(key > node->key){ node->right = insert(node->right, key);}
+  else{ return node; }
+
+  int balance = getBalance(node);
+
+  // ====== balancing tree ====== //
+  
+  // LL
+  if(balance>1 && key < node->left->key){ return rightRotate(node);}
+
+  // RR
+  if(balance<-1 && key > node->right->key){ return leftRotate(node);}
+
+  // LR
+  if(balance>1 && key > node->left->key){
+      node->left = leftRotate(node->left);
+      return rightRotate(node);
+  }
+
+  // RL
+  if (balance<-1 && key < node->right->key){
+      node->right = rightRotate(node->right);
+      return leftRotate(node);
+  }
+  
+  return node;
 }
 
 void preorder(Node* root){
